@@ -1,4 +1,5 @@
 
+#include "kgram_model.h"
 #include <iostream>
 #include <fstream>
 
@@ -18,7 +19,11 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    do the work
+    std::string text((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+     get the chart
+
+    std::string generated_text = model.generate(length);
+    std::cout << generated_text << std::endl;
 
     return 0;
 }
