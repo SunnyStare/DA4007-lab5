@@ -20,7 +20,9 @@ int main(int argc, char* argv[]) {
     }
 
     std::string text((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-     get the chart
+     get the chart(k, file) 
+
+     textgenerater(chart, length)
 
     std::string generated_text = model.generate(length);
     std::cout << generated_text << std::endl;
