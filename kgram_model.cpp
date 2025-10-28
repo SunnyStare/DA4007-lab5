@@ -9,7 +9,7 @@
 class KGramModel 
 {
 protected:
-    int k;
+    size_t k;
     std::string text;
     std::map<std::string, int> kgramCounts;
     std::map<std::string, std::map<char, int>> transitionCounts;
@@ -17,7 +17,7 @@ protected:
     std::map<std::string, std::map<char, float>> transitionProbabilities;
 
 public:
-    KGramModel(int k, const std::string& text);
+    KGramModel(size_t k, const std::string& text);
     void train();
     void computeKGramProbabilities();
     void computeTransitionProbabilities();
@@ -25,7 +25,7 @@ public:
     std::map<std::string, std::map<char, float>> getTransitionProbabilities() const;
 };
 
-KGramModel::KGramModel(int k_, const std::string& text_) : k(k_), text(text_) 
+KGramModel::KGramModel(size_t k_, const std::string& text_) : k(k_), text(text_) 
 {   
     if (k <= 0) 
     {        
@@ -33,7 +33,7 @@ KGramModel::KGramModel(int k_, const std::string& text_) : k(k_), text(text_)
         std::exit(EXIT_FAILURE);    
     }    
 
-    int text_length = static_cast<int>(text.size());    
+    size_t text_length = text.size();   
     if (text_length < k) 
     {        
         std::cerr << "FATAL: text length (" << text_length << ") < k (" << k << ")\n";        
@@ -49,7 +49,8 @@ void KGramModel::train()
     transitionCounts.clear();
     kgramProbabilities.clear();
     transitionProbabilities.clear();
-
+    
+    size_t text_length = text.size(); 
     for (int i = 0; i + k <= text_length; ++i) 
     {
         std::string kgram = text.substr(i, k);
@@ -115,11 +116,11 @@ private:
     char chooseMaxProbabilityNextChar(const std::string& kgram);
 
 public:
-    TextGenerator(int k, const std::string& text);
+    TextGenerator(size_t k, const std::string& text);
     std::string generateText(size_t length);
 };
 
-TextGenerator::TextGenerator(int k, const std::string& text)
+TextGenerator::TextGenerator(size_t k, const std::string& text)
     : KGramModel(k, text), rng(static_cast<unsigned int>(std::time(nullptr))) { }
 
 std::string TextGenerator::chooseMaxProbabilityKGram() 
@@ -146,7 +147,7 @@ std::string TextGenerator::chooseMaxProbabilityKGram()
         std::cerr << "Fatal error: no candidate k-gram found. Aborting.\n";
         std::exit(EXIT_FAILURE);
     }
-    std::uniform_int_distribution<size_t> dist(0, candidates.size() - 1);
+    std::uniform_int_distribution<size_t> dist(0, candidateKGrams.size() - 1);
     return candidateKGrams[dist(rng)];
 }
 
@@ -220,37 +221,58 @@ std::string TextGenerator::generateText(size_t length)
 #include <iterator>
 #include <stdexcept>
 
-int main(int argc, char* argv[]) {
-    if (argc != 4) {
+int main(int argc, char* argv[]) 
+{
+    if (argc != 4) 
+    {
         std::cerr << "Usage: " << argv[0] << " <k> <filename> <length>\n";
         return 1;
     }
 
-    int k = 0;
-    std::size_t length = 0;
-    try {
-        k = std::stoi(argv[1]);
-        if (k < 0) throw std::invalid_argument("k must be non-negative");
-        length = static_cast<std::size_t>(std::stoll(argv[3]));
-    } catch (const std::exception& e) {
+    int k_signed = 0;
+    long long length_signed = 0;
+    try 
+    {
+        k_signed = std::stoi(argv[1]);
+        length_signed = std::stoll(argv[3]);
+    } 
+    catch (const std::exception& e) 
+    {
         std::cerr << "Invalid numeric argument: " << e.what() << '\n';
         return 1;
     }
 
+    if (k_signed < 0) 
+    {
+        std::cerr << "k must be non-negative\n";
+        return 1;
+    }
+    if (length_signed < 0) 
+    {
+        std::cerr << "length must be non-negative\n";
+        return 1;
+    }
+
+    std::size_t k = static_cast<std::size_t>(k_signed);
+    std::size_t length = static_cast<std::size_t>(length_signed);
+
     std::string filename = argv[2];
     std::ifstream file(filename, std::ios::binary);
-    if (!file) {
+    if (!file) 
+    {
         std::cerr << "Error opening file: " << filename << '\n';
         return 1;
     }
 
     std::string text((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-    if (text.empty()) {
+    if (text.empty()) 
+    {
         std::cerr << "Input file is empty.\n";
         return 1;
     }
-    if (static_cast<std::size_t>(k) > text.size()) {
-        std::cerr << "k is larger than input text length.\n";
+    if (k > text.size()) 
+    {
+        std::cerr << "k should not be larger than input text length.\n";
         return 1;
     }
 
