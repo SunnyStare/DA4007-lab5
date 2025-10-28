@@ -1,5 +1,7 @@
 
 
+
+#include <iostream>
 #include <string>
 #include <map>
 #include <vector>
@@ -10,19 +12,24 @@ class KGramModel
 {
 protected:
     int k; 
+    std::string text;
     std::map<std::string, int> kgramCounts; 
     std::map<std::string, std::map<char, int>> transitionCounts; 
-    std::map<std::string, float> kgramProbabilities; 
-    void computeProbabilities();
+    void computekgramProbabilities();
+    void computeTransitionProbabilities();
 public:
-    KGramModel(int k, const std::string& text);{}
+    KGramModel::KGramModel(int k, const std::string& text);{}
     void train(const std::string& text);
+    std::map<std::string, float> kgramProbabilities; 
+    std::map<std::string, std::map<char, float>> TransitionProbabilities;
     std::map<std::string, float> getKGramFrequencies() const;
     std::map<std::string, std::map<char, float>> getTransitionProbabilities() const;
-    
-
 };
 
+KGramModel::KGramModel(int k, const std::string& text) : k(k) 
+{    
+    train(text); 
+}
 
 void KGramModel::train(const std::string& text) 
 {
@@ -38,26 +45,32 @@ void KGramModel::train(const std::string& text)
             transitionCounts[kgram][nextChar]++;
         }
     }
-    computeProbabilities();
+    computekgramProbabilities();
+    computeTransitionProbabilities();
 }
 
-void KGramModel::computeProbabilities() 
+void KGramModel::computeKGramProbabilities() 
 {
+    int totalCount = 0;
     for (const auto& pair : kgramCounts) 
     {
-        const std::string& kgram = pair.first;
-        int total = pair.second;
-        for (const auto& transition : transitionCounts[kgram]) 
+        totalCount += pair.second; 
+    }
+
+    
+    for (const auto& pair : kgramCounts) {
+        const std::string& kgram = pair.first; 
+        int count = pair.second; 
+        
+        if (totalCount > 0) 
+        { 
+            kgramProbabilities[kgram] = static_cast<float>(count) / static_cast<float>(totalKGramCount);
+        } 
+        else 
         {
-            char nextChar = transition.first;
-            kgramProbabilities[kgram + nextChar] = static_cast<float>(transition.second) / total;
+            std::cerr << "Error: total k-gram count is zero! k is bigger than textlength!" << std::endl;
         }
     }
-}
-
-KGramModel::KGramModel(int k, const std::string& text) : k(k) 
-{    
-    train(text); 
 }
 
 std::map<std::string, float> KGramModel::getKGramFrequencies() const 
@@ -65,9 +78,8 @@ std::map<std::string, float> KGramModel::getKGramFrequencies() const
     return kgramProbabilities;
 }
 
-std::map<std::string, std::map<char, float>> KGramModel::getTransitionProbabilities() const 
+void computeTransitionProbabilities()
 {
-    std::map<std::string, std::map<char, float>> TransitionProbabilities;
     for (const auto& elem : transitionCounts) 
     {
         int total = 0; 
@@ -94,5 +106,10 @@ std::map<std::string, std::map<char, float>> KGramModel::getTransitionProbabilit
             TransitionProbabilities[elem.first][pair.first] = static_cast<float>(pair.second) / static_cast<float>(total);
         }
     }
+}
+
+std::map<std::string, std::map<char, float>> KGramModel::getTransitionProbabilities() const 
+{
     return TransitionProbabilities;
 }
+
