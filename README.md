@@ -28,5 +28,5 @@ classTextGenerator.h/.cpp — text generation (inherits KGramModel)
 
 make_slm.txt (or Makefile) — build rules
 
-README.txt              — this file
+README.md              — this file
 
