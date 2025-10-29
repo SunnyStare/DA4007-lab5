@@ -8,7 +8,7 @@ After building, the executable is "slm".
 
 The unix command looks like:
 
-./slm size_t k string filename size_t length
+./slm  size_t k  string filename  size_t length
 
 Features
 -------------------------------
