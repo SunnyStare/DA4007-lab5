@@ -1,4 +1,4 @@
-#include "TextGenerator.h"
+#include "classTextGenerator.h"
 
 #include <iostream>
 #include <fstream>

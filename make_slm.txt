@@ -1,0 +1,24 @@
+CXX = g++
+CXXFLAGS = -std=c++17 -Wall -Wextra -O2
+LDFLAGS =
+
+OBJS = main.o classKGramModel.o classTextGenerator.o
+TARGET = slm
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CXX) $(LDFLAGS) $(OBJS) -o $(TARGET)
+
+main.o: main.cpp classTextGenerator.h
+	$(CXX) $(CXXFLAGS) -c main.cpp
+
+classTextGenerator.o: classTextGenerator.cpp classTextGenerator.h classKGramModel.h
+	$(CXX) $(CXXFLAGS) -c classTextGenerator.cpp
+
+classKGramModel.o: classKGramModel.cpp classKGramModel.h
+	$(CXX) $(CXXFLAGS) -c classKGramModel.cpp
+
+.PHONY: clean
+clean:
+	rm -f $(OBJS) $(TARGET)

@@ -1,4 +1,5 @@
-#include "TextGenerator.h"
+#include "classTextGenerator.h"
+
 #include <iostream>
 #include <vector>
 #include <cstdlib>   // for std::exit, EXIT_FAILURE

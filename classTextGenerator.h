@@ -1,7 +1,7 @@
 #ifndef TEXTGENERATOR_H
 #define TEXTGENERATOR_H
 
-#include "KGramModel.h"
+#include "classKGramModel.h"
 #include <random>
 #include <string>
 #include <cstddef> // for std::size_t
@@ -9,7 +9,7 @@
 class TextGenerator : public KGramModel
 {
 private:
-    std::mt19937 rng;
+    mutable std::mt19937 rng;
 
     // Select the k-gram with the highest probability (does not modify object state)
     std::string chooseMaxProbabilityKGram() const;

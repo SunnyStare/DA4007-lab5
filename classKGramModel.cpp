@@ -1,4 +1,4 @@
-#include "KGramModel.h"
+#include "classKGramModel.h"
 
 #include <iostream>
 #include <cstdlib>   // for std::exit, EXIT_FAILURE
